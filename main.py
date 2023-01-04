@@ -1,3 +1,5 @@
+from random import shuffle
+from time import thread_time
 class LinkedList:
     # The __Node class is used internally by the LinkedList class. It is
     # invisible from outside this class due to the two underscores
@@ -58,7 +60,24 @@ class LinkedList:
 
     def insert(self, index, item):
         # This is left as an exercise for the reader.
-        pass
+      if index == 0:
+        self.numItems += 1
+        cursor = self.first
+        newitem = self.__Node(item,cursor.getNext())
+        cursor.setNext(newitem)
+        return
+      if 0 <= index:
+        
+        cursor = self.first.getNext()
+        for i in range(1, index):
+          cursor = cursor.getNext()
+          if cursor == None:
+            cursor = self.first.getNext()
+        newitem = self.__Node(item,cursor.getNext())
+        cursor.setNext(newitem)
+        self.numItems += 1
+        return
+        
 
     def __add__(self, other):
         if type(self) != type(other):
@@ -67,25 +86,95 @@ class LinkedList:
 
         result = LinkedList()
 
+        cursor_self = self.first.getNext()
+
+        while cursor_self is not None:
+          result.append(cursor_self.getItem())
+          cursor_self = cursor_self.getNext()
+        cursor_other = other.first.getNext()
+
+        while cursor_other is not None:
+          result.append(cursor_other.getItem())
+          cursor_other = cursor_other.getNext()
+      
+
         #TODO: Finish this.
 
         return result
 
     def __contains__(self, item):
         # This is left as an exercise for the reader.
-        pass
+      cursor_self = self.first.getNext()
+      while cursor_self is not None:
+        if cursor_self.getItem() == item:
+          return True
+        cursor_self = cursor_self.getNext()
+
+      return False
+
+        
 
     def __delitem__(self, index):
         # This is left as an exercise for the reader.
-        pass
+      
+      if 0 < index < self.numItems:
+        cursor = self.first.getNext()
+      
+        for i in range(index-1):
+          cursor = cursor.getNext()
+        toDelete = cursor.getNext()
+        cursor.setNext(cursor.getNext().getNext())
+        toDelete.setNext(None)
+        self.numItems -= 1
+        return
+      elif index == 0: 
+        toDelete = self.first.getNext()
+        self.first.setNext(toDelete.getNext())
+        toDelete.setNext(None)
+        self.numItems -= 1
+        raise IndexError("LinkedLisk index out of range")
 
+      
+    def swap(self,i,j):
+      temp = self[j]
+      self[j] = self[i]
+      self[i] = temp
+      
+    def isSorted(self):
+      cursor = self.first.getNext()
+      while cursor.getNext() is not None:
+        if cursor.getItem() > cursor.getNext().getItem():
+          return False
+        cursor = cursor.getNext()
+      return True
+      
+    def bubbleSort(self):
+      while not self.isSorted():
+        for i in range(self.numItems - 1):
+          if self[i]>self[i+1]:
+            self.swap(i,i+1)
+      
     def __eq__(self, other):
         # This is left as an exercise for the reader.
-        pass
+      if type(self) != type(other):
+        return False
+      if self.numItems != other.numItems:
+        return False
+      cursor_self = self.first.getNext()
+      cursor_other = other.first.getNext()
+
+      while cursor_self is not None:
+        if cursor_self.getItem() != cursor_other.getItem():
+          return False
+
+        cursor_self = cursor_self.getNext()
+        cursor_other = cursor_other.getNext()
+
+      return True
 
     def __len__(self):
         # This is left as an exercise for the reader.
-        pass
+      return self.numItems
 
     def append(self, item):
         node = LinkedList.__Node(item)
@@ -95,8 +184,20 @@ class LinkedList:
 
     def __str__(self):
         # This is left as an exercise for the reader.
-        pass
+      curser = self.first.getNext()
+      outString = "["
+      
+      
+      while curser is not None:
+        outString += str(curser.getItem())
+        outString += ","
 
+        curser = curser.getNext()
+      outString = outString.rstrip(",")
+      outString += "]"
+      return outString
+    
+    
 
 def main():
     lst = LinkedList()
@@ -117,7 +218,7 @@ def main():
     lst3 = lst + lst2
 
     if len(lst3) == len(lst) + len(lst2):
-        print("Test 2 Passed")
+      print("Test 2 Passed")
     else:
         print("Test 2 Failed")
 
@@ -159,8 +260,11 @@ def main():
     lst.insert(0, 100)
     lst4 = LinkedList([100]) + lst4
 
+    print(lst)
+    print(lst4)
+
     if lst == lst4:
-        print("Test 9 Passed")
+      print("Test 9 Passed")
     else:
         print("Test 9 Failed")
 
@@ -168,13 +272,16 @@ def main():
     lst4.append(333)
 
     if lst == lst4:
-        print("Test 10 Passed")
+      print("Test 10 Passed")
     else:
-        print("Test 10 Failed")
-
+      print("Test 10 Failed")
+      
     print(lst)
     print(lst4)
 
-
+    lst5 = LinkedList([5,4,3,2,1])
+    print(lst5.isSorted())
+    lst5.bubbleSort()
+    print(lst5)
 if __name__ == "__main__":
     main()
